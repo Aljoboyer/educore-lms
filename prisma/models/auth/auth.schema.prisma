@@ -1,0 +1,32 @@
+
+enum UserRole {
+  ADMIN
+  INSTRUCTOR
+  STUDENT
+}
+
+enum UserStatus {
+  ACTIVE
+  PENDING
+  SUSPENDED
+  DELETED
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String  
+  role      UserRole @default(STUDENT)
+  status    UserStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  @@map("users")
+
+  @@index([email])
+
+  @@index([status])
+
+  @@index([role])
+
+  @@index([createdAt])
+}
