@@ -32,7 +32,7 @@ export class AuthService {
             const user = await tx.user.create({
                 data: authObj,
             });
-
+            
             const userObj = {
                 userId: user.id,
                 firstName: registerUserDto.firstName,
