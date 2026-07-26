@@ -55,17 +55,14 @@ export class RegisterUserDto {
     @IsString()
     institution!: string
     
-    @IsOptional()
     @IsNumber()
-    totalCourses?: number
+    totalCourses!: number
 
-    @IsOptional()
     @IsNumber()
-    completedCourses?: number
+    completedCourses!: number
 
-    @IsOptional()
     @IsNumber()
-    totalCertificates?: number
+    totalCertificates!: number
 
     @IsOptional()
     @IsString()
