@@ -3,6 +3,7 @@ import { RegisterUserDto } from './dto/registeruser.dto';
 import { PrismamodService } from 'src/prismamod/prismamod.service';
 import { EncryptService } from './encrypt/encrypt.service';
 import { JwtService } from '@nestjs/jwt';
+import { LoginUserDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -60,6 +61,26 @@ export class AuthService {
         });
     }
 
+    
+    async loginUser(loginUserDto: LoginUserDto) {
+        const user = await this.prisma.user.findUnique({
+            where: { email: loginUserDto.email },
+        });
+        if (!user) {
+            throw new ConflictException('User with this email does not exist');
+        }
+        const isMatch = await this.hashService.comparePassword(loginUserDto.password, user.password);
+        if (!isMatch) {
+            throw new ConflictException('Invalid password');
+        }
+        const payload = { email: user.email, role: user.role, id: user.id };
+        const token = await this.jwtService.signAsync(payload);
+        return {
+            message: 'User logged in successfully',
+            token: token,
+        };
+    }
+    
     async getUserProfile(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
@@ -75,4 +96,5 @@ export class AuthService {
             user,
         };
     }
+
 }

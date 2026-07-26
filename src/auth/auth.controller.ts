@@ -3,6 +3,7 @@ import { Body, Controller, HttpException,
     Param} from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { RegisterUserDto } from './dto/registeruser.dto';
+import { LoginUserDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -23,6 +24,17 @@ export class AuthController {
         }
     }
 
+    @Post('login')
+    async loginUser(@Body() dto: LoginUserDto) {
+        try {
+            return await this.authService.loginUser(dto);
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error; 
+            }
+            throw new InternalServerErrorException('Something went wrong');
+        }
+    }
 
     @Get(':id')
     async getUser(@Param('id') id: string) {
