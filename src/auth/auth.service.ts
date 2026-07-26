@@ -1,15 +1,19 @@
 import { ConflictException, Injectable } from '@nestjs/common';
 import { RegisterUserDto } from './dto/registeruser.dto';
 import { PrismamodService } from 'src/prismamod/prismamod.service';
+import { EncryptService } from './encrypt/encrypt.service';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
     constructor(
-        private readonly prisma: PrismamodService
+        private readonly prisma: PrismamodService,
+        private readonly hashService: EncryptService,
+        private readonly jwtService: JwtService
     ) {}
 
     async registerUser(registerUserDto: RegisterUserDto) {
-        await this.prisma.$transaction(async (tx) => {
+        return await this.prisma.$transaction(async (tx) => {
             const existingUser = await tx.user.findUnique({
                 where: { email: registerUserDto.email },
             });
@@ -17,9 +21,10 @@ export class AuthService {
                 throw new ConflictException('User with this email already exists');
             }
 
+            const hashedPassword = await this.hashService.hashPassword(registerUserDto.password);
             const authObj = {
                 email: registerUserDto.email,
-                password: registerUserDto.password,
+                password: hashedPassword,
                 role: registerUserDto.role,
                 updatedAt: new Date(),
             }
@@ -45,10 +50,29 @@ export class AuthService {
             await tx.userProfile.create({
                 data: userObj,
             });
+
+            const payload = { email: user.email, role: user.role, id:  user.id };
+            const token = await this.jwtService.signAsync(payload);
+            return  {
+                message: 'User created successfully',
+                token: token,
+            }
         });
-        return  {
-            message: 'User created successfully',
-            token: 'token',
+    }
+
+    async getUserProfile(id: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { id },
+            include: {
+                profile: true,
+            },
+        });
+        if (!user) {
+            throw new ConflictException('User not found');
         }
+        return {
+            message: 'User fetched successfully',
+            user,
+        };
     }
 }
