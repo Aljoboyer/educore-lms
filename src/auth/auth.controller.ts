@@ -60,4 +60,17 @@ export class AuthController {
             throw new InternalServerErrorException('Something went wrong');
         }
     }
+
+    @UseGuards(AuthGuard)
+    @Post('update-profile')
+    async updateUserProfile(@Body() body: any) {
+        try {
+            return await this.authService.updateUserProfile(body);
+        } catch (error) {
+            if (error instanceof HttpException) {
+                throw error; 
+            }
+            throw new InternalServerErrorException('Something went wrong');
+        }
+    }
 }

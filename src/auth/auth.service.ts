@@ -4,6 +4,7 @@ import { PrismamodService } from 'src/prismamod/prismamod.service';
 import { EncryptService } from './encrypt/encrypt.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.dto';
+import { ProfileUpdateDto } from './dto/profileupdate.dto';
 
 @Injectable()
 export class AuthService {
@@ -81,7 +82,6 @@ export class AuthService {
         };
     }
     
-
     async getUserProfile(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
@@ -116,6 +116,22 @@ export class AuthService {
 
         return {
             message: 'Password changed successfully',
+        };
+    }
+
+    async updateUserProfile(updateUserDto: ProfileUpdateDto) {
+        const userProfile = await this.prisma.userProfile.findUnique({
+            where: { id: updateUserDto.id },
+        });
+        if (!userProfile) {
+            throw new ConflictException('User profile not found');
+        }
+         await this.prisma.userProfile.update({
+            where: { id: updateUserDto.id },
+            data: updateUserDto,
+        });
+        return {
+            message: 'User profile updated successfully',
         };
     }
 }
