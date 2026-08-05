@@ -3,9 +3,11 @@ import { Body, Controller, HttpException,
     Param,
     UseGuards} from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { RegisterUserDto } from './dto/registeruser.dto';
+import { RegisterUserDto, UserRole } from './dto/registeruser.dto';
 import { LoginUserDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
+import { RolesGuard } from './roles.guard';
+import { Roles } from './decorators/roles.decorator';
 
 @Controller('auth')
 export class AuthController {
@@ -38,7 +40,8 @@ export class AuthController {
         }
     }
 
-    @UseGuards(AuthGuard)
+    @UseGuards(AuthGuard, RolesGuard)
+    @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
     @Get(':id')
     async getUser(@Param('id') id: string) {
         return await this.authService.getUserProfile(id);
