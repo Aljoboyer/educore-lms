@@ -10,6 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 import { validationSchema } from '../src/db-connect/database/config/validation';
 import { AuthModule } from './auth/auth.module';
 import { PrismamodModule } from './prismamod/prismamod.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -24,7 +25,8 @@ import { PrismamodModule } from './prismamod/prismamod.module';
       validationSchema,
     }),
     AuthModule,
-    PrismamodModule
+    PrismamodModule,
+    CommonModule
   ],
   controllers: [AppController],
   providers: [AppService],
