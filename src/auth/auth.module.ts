@@ -5,9 +5,10 @@ import { PrismamodModule } from 'src/prismamod/prismamod.module';
 import { EncryptService } from './encrypt/encrypt.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
+import { AuthGuard } from './auth.guard';
 
 @Module({
-  providers: [AuthService,EncryptService],
+  providers: [AuthService,EncryptService, AuthGuard],
   controllers: [AuthController],
   imports: [
     PrismamodModule,
@@ -22,6 +23,6 @@ import { ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  exports: [JwtModule],
+  exports: [JwtModule, AuthGuard],
 })
 export class AuthModule {}

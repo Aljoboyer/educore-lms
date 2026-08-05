@@ -81,6 +81,7 @@ export class AuthService {
         };
     }
     
+
     async getUserProfile(id: string) {
         const user = await this.prisma.user.findUnique({
             where: { id },
@@ -97,4 +98,24 @@ export class AuthService {
         };
     }
 
+    async changePassword(email: string, newPassword: string) {
+        const user = await this.prisma.user.findUnique({
+            where: { email },
+        });
+        if (!user) {
+            throw new ConflictException('User not found');
+        }
+        if(newPassword.length < 6) {
+            throw new ConflictException('Password must be at least 6 characters long');
+        }
+        const hashedPassword = await this.hashService.hashPassword(newPassword);
+        await this.prisma.user.update({
+            where: { email },
+            data: { password: hashedPassword },
+        });
+
+        return {
+            message: 'Password changed successfully',
+        };
+    }
 }
