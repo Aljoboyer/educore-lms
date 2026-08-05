@@ -6,9 +6,10 @@ import { EncryptService } from './encrypt/encrypt.service';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { AuthGuard } from './auth.guard';
+import { RolesGuard } from './roles.guard';
 
 @Module({
-  providers: [AuthService,EncryptService, AuthGuard],
+  providers: [AuthService,EncryptService, AuthGuard, RolesGuard],
   controllers: [AuthController],
   imports: [
     PrismamodModule,
@@ -23,6 +24,6 @@ import { AuthGuard } from './auth.guard';
       }),
     }),
   ],
-  exports: [JwtModule, AuthGuard],
+  exports: [JwtModule, AuthGuard, RolesGuard],
 })
 export class AuthModule {}

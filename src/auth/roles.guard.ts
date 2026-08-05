@@ -4,12 +4,13 @@ import { Reflector } from '@nestjs/core';
 import { ROLES_KEY } from './decorators/roles.decorator';
 import { UserRole } from './dto/registeruser.dto';
 import { AuthService } from './auth.service';
+import { PrismamodService } from 'src/prismamod/prismamod.service';
 
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(
     private reflector: Reflector,
-    private readonly authService: AuthService
+    private readonly prisma: PrismamodService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -22,16 +23,13 @@ export class RolesGuard implements CanActivate {
     }
     const { user } = context.switchToHttp().getRequest();
 
-    const getUserRole = async () => {
-      // Assuming you have a service to fetch user details from the database
-      const userDetails = await this.authService.getUserProfile(user.id);
-      return userDetails;
-    };
-    const UserData: any = await getUserRole();
-   
-    if(UserData.user.status !== 'ACTIVE') {
+    const UserData: any =   await this.prisma.user.findUnique({
+        where: { id: user.id },
+      });
+  
+    if(UserData.status !== 'ACTIVE') {
       return false;
     }
-    return requiredRoles.some((role) => UserData.user.role === role);
+    return requiredRoles.some((role) => UserData.role === role);
   }
 }

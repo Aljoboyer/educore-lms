@@ -1,5 +1,4 @@
-import { IsDate, IsEnum, IsNumber, IsOptional, MinLength } from "class-validator"
-import { IsString } from "class-validator/types/decorator/typechecker/IsString"
+import { IsDate, IsEnum, IsNumber, IsOptional, MinLength , IsString} from "class-validator"
 import { Gender } from "./registeruser.dto"
 
 export class ProfileUpdateDto { 
