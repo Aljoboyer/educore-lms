@@ -8,6 +8,7 @@ import { LoginUserDto } from './dto/login.dto';
 import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
 import { Roles } from './decorators/roles.decorator';
+import { ProfileUpdateDto } from './dto/profileupdate.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -63,7 +64,7 @@ export class AuthController {
 
     @UseGuards(AuthGuard)
     @Post('update-profile')
-    async updateUserProfile(@Body() body: any) {
+    async updateUserProfile(@Body() body: ProfileUpdateDto) {
         try {
             return await this.authService.updateUserProfile(body);
         } catch (error) {
