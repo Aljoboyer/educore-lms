@@ -3,9 +3,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import Redis from 'ioredis';
 import { RedisService } from './redis.service';
 import { REDIS_CLIENT } from './redis.constants';
+import { RedisController } from './redis.controller';
 
 @Module({
-imports: [ConfigModule, RedisModule],
+imports: [ConfigModule],
   providers: [
     {
       provide: REDIS_CLIENT,
@@ -29,5 +30,7 @@ imports: [ConfigModule, RedisModule],
   ],
 
   exports: [RedisService],
+
+  controllers: [RedisController],
 })
 export class RedisModule {}

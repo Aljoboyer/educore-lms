@@ -11,6 +11,7 @@ import { validationSchema } from '../src/db-connect/database/config/validation';
 import { AuthModule } from './auth/auth.module';
 import { PrismamodModule } from './prismamod/prismamod.module';
 import { CommonModule } from './common/common.module';
+import { RedisModule } from './infrastructure/redis/redis.module';
 
 @Module({
   imports: [
@@ -26,7 +27,8 @@ import { CommonModule } from './common/common.module';
     }),
     AuthModule,
     PrismamodModule,
-    CommonModule
+    CommonModule,
+    RedisModule
   ],
   controllers: [AppController],
   providers: [AppService],
