@@ -67,6 +67,7 @@ export class AuthService {
         const user = await this.prisma.user.findUnique({
             where: { email: loginUserDto.email },
         });
+
         if (!user) {
             throw new ConflictException('User with this email does not exist');
         }
@@ -74,6 +75,7 @@ export class AuthService {
         if (!isMatch) {
             throw new ConflictException('Invalid password');
         }
+       
         const payload = { email: user.email, role: user.role, id: user.id };
         const token = await this.jwtService.signAsync(payload);
         return {
