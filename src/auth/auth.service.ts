@@ -5,13 +5,15 @@ import { EncryptService } from './encrypt/encrypt.service';
 import { JwtService } from '@nestjs/jwt';
 import { LoginUserDto } from './dto/login.dto';
 import { ProfileUpdateDto } from './dto/profileupdate.dto';
+import { RedisService } from 'src/infrastructure/redis/redis.service';
 
 @Injectable()
 export class AuthService {
     constructor(
         private readonly prisma: PrismamodService,
         private readonly hashService: EncryptService,
-        private readonly jwtService: JwtService
+        private readonly jwtService: JwtService,
+        private readonly redisService: RedisService
     ) {}
 
     async registerUser(registerUserDto: RegisterUserDto) {
@@ -85,6 +87,16 @@ export class AuthService {
     }
     
     async getUserProfile(id: string) {
+        const cacheKey = `user:${id}`
+
+        const cachedUser = await this.redisService.get<any>(cacheKey)
+
+        if(cachedUser){
+            return {
+                message: 'User fetched from cached successfully',
+                user: cachedUser,
+            };
+        }
         const user = await this.prisma.user.findUnique({
             where: { id },
             include: {
@@ -94,6 +106,12 @@ export class AuthService {
         if (!user) {
             throw new ConflictException('User not found');
         }
+
+        await this.redisService.set(
+            cacheKey,
+            JSON.stringify(user),
+        );
+
         return {
             message: 'User fetched successfully',
             user,
@@ -132,6 +150,11 @@ export class AuthService {
             where: { id: updateUserDto.id },
             data: updateUserDto,
         });
+
+        const cacheKey = `user:${userProfile.userId}`
+
+        await this.redisService.delete(cacheKey)
+
         return {
             message: 'User profile updated successfully',
         };

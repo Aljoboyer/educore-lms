@@ -45,7 +45,12 @@ export class AuthController {
     @Roles(UserRole.ADMIN, UserRole.INSTRUCTOR)
     @Get(':id')
     async getUser(@Param('id') id: string) {
-        return await this.authService.getUserProfile(id);
+        try {
+            return await this.authService.getUserProfile(id);
+        } catch (error) {
+            console.log('testing ===>', error)
+             throw new InternalServerErrorException('Something went wrong');
+        }
     }
 
     @UseGuards(AuthGuard)

@@ -32,7 +32,7 @@ export class RedisService {
 
   async set(
     key: string,
-    value: string,
+    value: any,
     ttl?: number,
   ): Promise<'OK'> {
     if (ttl) {
