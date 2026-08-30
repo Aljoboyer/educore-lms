@@ -4,6 +4,7 @@ import { PrismamodService } from 'src/prismamod/prismamod.service';
 import { CourseRepository } from 'src/common/baserepository';
 import { PaginationService } from 'src/common/pagination/pagination.service';
 import { PaginationDto } from 'src/common/pagination/pagination.dto';
+import { RedisService } from 'src/infrastructure/redis/redis.service';
 
 @Injectable()
 export class CourseService {
@@ -12,7 +13,7 @@ export class CourseService {
         private readonly prisma: PrismamodService,
         private readonly courseRepository: CourseRepository,
         private readonly paginationService: PaginationService,
-
+        private readonly redisService: RedisService
     ) {}
 
     async createCourse(courseData: CreateCourseDto) {
@@ -23,9 +24,9 @@ export class CourseService {
         };
     }
 
-    async getAllCourses(paginationDto: PaginationDto) {
-    
-        return this.paginationService.paginate({
+    async getAllCourses(paginationDto: PaginationDto, userId: string) {
+
+        const formatedData = this.paginationService.paginate({
             page: Number(paginationDto.page),
             limit: Number(paginationDto.limit),
             order: paginationDto.sort,
@@ -51,5 +52,19 @@ export class CourseService {
                 where: args.where,
             }),
         });
+
+        const cacheKey = `recent-search:${userId}`
+        await this.redisService.lpush(cacheKey, paginationDto.search)
+        return formatedData
+    }
+
+    async getRecentSearch(userId: string){
+        const cacheKey = `recent-search:${userId}`
+        const recentSearchKey = await this.redisService.lrange(cacheKey, 0, -1)
+
+        return {
+            recentSearchKey,
+            message: 'Key found'
+        }
     }
 }

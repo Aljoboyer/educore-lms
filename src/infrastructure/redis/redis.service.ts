@@ -61,6 +61,17 @@ export class RedisService {
     return this.redis.exists(key);
   }
 
+  async lpush(key: string, value: any){
+      return this.redis.lpush(key, value)
+  }
+
+  async lrange(key: string, idx1: number, idx2: number){
+    return await this.redis.lrange(
+        key,
+        idx1,
+        idx2,
+    );
+  }
   async onModuleDestroy() {
     await this.redis.quit();
 

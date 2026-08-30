@@ -89,14 +89,16 @@ export class AuthService {
     async getUserProfile(id: string) {
         const cacheKey = `user:${id}`
 
-        const cachedUser = await this.redisService.get<any>(cacheKey)
+        const existsUserInCache = await this.redisService.exists(cacheKey);
 
-        if(cachedUser){
-            return {
+        if(existsUserInCache){
+           const cachedUser = await this.redisService.get<any>(cacheKey)
+              return {
                 message: 'User fetched from cached successfully',
                 user: cachedUser,
             };
         }
+
         const user = await this.prisma.user.findUnique({
             where: { id },
             include: {

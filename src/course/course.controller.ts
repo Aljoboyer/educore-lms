@@ -1,4 +1,4 @@
-import { Body, Controller, Get, HttpException, InternalServerErrorException, Param, Post, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, HttpException, InternalServerErrorException, Param, Post, Query, Request, UseGuards } from '@nestjs/common';
 import { CourseService } from './course.service';
 import { AuthGuard } from '../auth/auth.guard';
 import { CreateCourseDto } from './dto/createcourse.dto';
@@ -27,14 +27,23 @@ export class CourseController {
 
   @UseGuards(AuthGuard)
   @Get('getAllcourses')
-  async getAllCourses(@Query() params: PaginationDto) {
+  async getAllCourses(@Query() params: PaginationDto, @Request() req: any) {
     try {
-      return this.courseService.getAllCourses(params);
+      const userId = (req.user as any).id;
+    
+      return this.courseService.getAllCourses(params, userId);
     } catch (error: any) {
         if (error instanceof HttpException) {
             throw error;
         }
         throw new InternalServerErrorException(error.message || 'Something went wrong');
     }
+  }
+
+  @UseGuards(AuthGuard)
+  @Get('recentSearch')
+  async getRecentSearch(@Request() req: any){
+      const userId: string = (req.user as any).id;
+    return this.courseService.getRecentSearch(userId)
   }
 }
