@@ -64,7 +64,15 @@ export class RedisService {
   async lpush(key: string, value: any){
       return this.redis.lpush(key, value)
   }
+  async sadd(key: string, value: any) {
+      console.log('Redis SADD:', key, value);
+      return this.redis.sadd(key, value);
+  }
 
+  async smembers(key: string) {
+      console.log('Redis SMEMBERS:', key);
+      return this.redis.smembers(key);
+  }
   async lrange(key: string, idx1: number, idx2: number){
     return await this.redis.lrange(
         key,
@@ -72,9 +80,11 @@ export class RedisService {
         idx2,
     );
   }
+
   async onModuleDestroy() {
     await this.redis.quit();
 
     this.logger.log('Redis connection closed');
   }
+
 }

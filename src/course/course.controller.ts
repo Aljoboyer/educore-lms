@@ -46,4 +46,13 @@ export class CourseController {
       const userId: string = (req.user as any).id;
     return this.courseService.getRecentSearch(userId)
   }
+
+  @Post('redis-set-test')
+  async redisSetTest(@Body() body: any) {
+    try {
+      return this.courseService.redisSetTest(body);
+    } catch (error) {
+      console.error('Error in redisSetTest:', error);
+    }
+  }
 }

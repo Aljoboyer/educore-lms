@@ -67,4 +67,16 @@ export class CourseService {
             message: 'Key found'
         }
     }
+
+    async redisSetTest(body: any) {
+        const { key, value } = body;
+        await this.redisService.sadd(key, value);
+          
+        const setMembers = await this.redisService.smembers(key);
+
+        return {
+            message: 'Key set successfully',
+            setMembers,
+        };
+    }
 }
